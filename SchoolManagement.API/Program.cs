@@ -1,7 +1,11 @@
 using Microsoft.EntityFrameworkCore;
+using SchoolManagement.API.MapperProfiles;
 using SchoolManagement.DAL;
 using SchoolManagement.DAL.UnitOfWork;
 using SchoolManagement.DAL.UnitOfWork.Interfaces;
+using SchoolManagement.Services;
+using SchoolManagement.Services.Interfaces;
+using SchoolManagement.Shared.Settings;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,6 +18,12 @@ builder.Services.AddDbContext<SchoolDbContext>(
 
 builder.Services.AddLogging();
 
+builder.Services.AddAutoMapper(config =>
+{
+    config.AddProfile(new StudentMapperProfile());
+    config.AddProfile(new TeacherMapperProfile());
+});
+
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -21,6 +31,11 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddScoped<IDatabaseInitializer, DatabaseInitializer>();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+builder.Services.AddScoped<IDashboardService, DashboardService>();
+builder.Services.AddScoped<IStudentService, StudentService>();
+builder.Services.AddScoped<ITeacherService, TeacherService>();
+
+builder.Services.Configure<AppSettings>(builder.Configuration.GetSection("AppSettings"));
 
 var app = builder.Build();
 
